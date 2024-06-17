@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 export async function createAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
-    'users',
+    '/users',
     {
       schema: {
         body: z.object({
