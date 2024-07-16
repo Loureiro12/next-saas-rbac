@@ -3,7 +3,7 @@ import fastifyJwt from '@fastify/jwt'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUI from '@fastify/swagger-ui'
 import { env } from '@saas/env'
-import { fastify } from 'fastify'
+import fastify from 'fastify'
 import {
   jsonSchemaTransform,
   serializerCompiler,
@@ -11,23 +11,36 @@ import {
   ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
-import { errorHandler } from './error-handler'
-import { authenticateWithGithub } from './routes/auth/authenticate-with-github'
-import { authenticateWithPassword } from './routes/auth/authenticate-with-password'
+import { errorHandler } from '@/http/error-handler'
+import { authenticateWithGithub } from '@/http/routes/auth/authenticate-with-github'
+import { authenticateWithPassword } from '@/http/routes/auth/authenticate-with-password'
+import { getProfile } from '@/http/routes/auth/get-profile'
+import { requestPasswordRecover } from '@/http/routes/auth/request-password-recover'
+import { resetPassword } from '@/http/routes/auth/reset-password'
+import { getOrganizationBilling } from '@/http/routes/billing/get-organization-billing'
+import { revokeInvite } from '@/http/routes/invite/revoke-invite'
+import { getMembers } from '@/http/routes/members/get-members'
+import { removeMember } from '@/http/routes/members/remove-member'
+import { updateMember } from '@/http/routes/members/update-member'
+import { createOrganization } from '@/http/routes/orgs/create-organization'
+import { getMembership } from '@/http/routes/orgs/get-membership'
+import { getOrganization } from '@/http/routes/orgs/get-organization'
+import { getOrganizations } from '@/http/routes/orgs/get-organizations'
+import { transferOrganization } from '@/http/routes/orgs/transfer-organization'
+import { updateOrganization } from '@/http/routes/orgs/update-organization'
+import { createProject } from '@/http/routes/projects/create-project'
+import { deleteProject } from '@/http/routes/projects/delete-project'
+import { getProject } from '@/http/routes/projects/get-project'
+import { getProjects } from '@/http/routes/projects/get-projects'
+import { updateProject } from '@/http/routes/projects/update-project'
+
 import { createAccount } from './routes/auth/create-account'
-import { getProfile } from './routes/auth/get-profile'
-import { requestPasswordRecover } from './routes/auth/request-password-recover'
-import { resetPassword } from './routes/auth/reset-password'
-import { createOrganization } from './routes/orgs/create-organization'
-import { getMembership } from './routes/orgs/get-membership'
-import { getOrganization } from './routes/orgs/get-organization'
-import { getOrganizations } from './routes/orgs/get-organizations'
+import { acceptInvite } from './routes/invite/accept-invite'
+import { createInvite } from './routes/invite/create-invite'
+import { getInvite } from './routes/invite/get-invite'
+import { getPendingInvites } from './routes/invite/get-pending-invites'
+import { rejectInvite } from './routes/invite/reject-invite'
 import { shutdownOrganization } from './routes/orgs/shutdown-organization.ts'
-import { transferOrganization } from './routes/orgs/transfer-organization'
-import { updateOrganization } from './routes/orgs/update-organization'
-import { createProject } from './routes/projects/create-project'
-import { deleteProject } from './routes/projects/delete-project'
-import { getProject } from './routes/projects/get-project'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -68,15 +81,15 @@ app.register(fastifyCors)
 
 app.register(createAccount)
 app.register(authenticateWithPassword)
+app.register(authenticateWithGithub)
 app.register(getProfile)
 app.register(requestPasswordRecover)
 app.register(resetPassword)
-app.register(authenticateWithGithub)
 
 app.register(createOrganization)
 app.register(getMembership)
-app.register(getOrganizations)
 app.register(getOrganization)
+app.register(getOrganizations)
 app.register(updateOrganization)
 app.register(shutdownOrganization)
 app.register(transferOrganization)
@@ -84,7 +97,22 @@ app.register(transferOrganization)
 app.register(createProject)
 app.register(deleteProject)
 app.register(getProject)
+app.register(getProjects)
+app.register(updateProject)
+
+app.register(getMembers)
+app.register(updateMember)
+app.register(removeMember)
+
+app.register(createInvite)
+app.register(getInvite)
+app.register(acceptInvite)
+app.register(rejectInvite)
+app.register(revokeInvite)
+app.register(getPendingInvites)
+
+app.register(getOrganizationBilling)
 
 app.listen({ port: env.SERVER_PORT }).then(() => {
-  console.log(`Server running on http://localhost:${env.SERVER_PORT}`)
+  console.log('HTTP server running!')
 })
